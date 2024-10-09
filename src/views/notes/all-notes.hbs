@@ -1,0 +1,51 @@
+<div class="row">
+  {{#each notes}}
+  <div class="col-md-3 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title d-flex justify-content-between align-items-center">
+          {{ title }} <a href="/notes/edit/{{_id}}"><i class="fas fa-edit"></i></a>
+        </h4>
+        <p>{{ description }}</p>
+        <button class="btn btn-danger btn-block btn-sm" onclick="deleteNote('{{_id}}')">ELIMINAR</button>
+      </div>
+    </div>
+  </div>
+  {{else}}
+  <div class="card mx-auto">
+    <div class="card-body">
+      <h1>HOLA {{user.name}}</h1>
+      <p class="lead">Aún no hay rutinas</p>
+      <a href="/notes/add" class="btn btn-success btn-block">Crear una rutina!</a>
+    </div>
+  </div>
+  {{/each}}
+</div>
+
+<script>
+  async function deleteNote(id) {
+    const confirmed = confirm('¿Estás seguro de que deseas eliminar esta rutina?');
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/notes/delete/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token') // si estás usando JWT
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar la nota');
+      }
+
+      const result = await response.json();
+      alert(result.message);
+      location.reload(); // Recargar la página para reflejar los cambios
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Hubo un problema al eliminar la nota.');
+    }
+  }
+</script>
